@@ -25,11 +25,11 @@ export default function AddDailyForcast() {
     
 
     if (!prediction.trim()) {
-      Swal.fire("Oops!", "Prediction can't be empty!", "warning");
+      Swal.fire("Oops!", "Prediction cannot be empty.!", "warning");
       return;
     }
     if (totalCharacters > 5000) {
-      Swal.fire("Oops!", "Prediction can't exceed 5000 words!", "warning");
+      Swal.fire("Oops!", "Prediction cannot exceed 5000 words!", "warning");
       return;
     }
 
@@ -51,8 +51,14 @@ export default function AddDailyForcast() {
       if (response.status === "success") {
         setPrediction("");
         // setDate(new Date().toISOString().split("T")[0]);
-        setMessage(response.message);
         setDate("")
+        await Swal.fire({
+          title: "Success!",
+          text: response.message,
+          icon: "success",
+          showConfirmButton: false, // Hide the confirm button
+          timer: 2000, // Auto-close after 2 seconds (2000ms)
+        });
       } else {
         setMessage(response.error);
         Swal.fire("Already Exist!", response.response.data.message, "warning");

@@ -106,9 +106,9 @@ export default function AdminLogin() {
       <div className="container">
         <div className="row align-items-center">
           <div className="col-md-6 col-lg-6 imgCon">
-            <img src={logo} alt="Logo" height="60%" width="60%" />
+            <img src={logo} alt="Logo" height="70%" width="70%" />
           </div>
-          <div className="col-md-6 col-lg-5">
+          <div className="col-md-6 col-lg-6" style={{display:"flex",justifyContent:"center"}}>
             <div className="login-box bg-white box-shadow border-radius-10">
               <div className="login-title">
                 <h2 className="text-center text-primary">Login</h2>

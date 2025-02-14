@@ -106,7 +106,7 @@ export default function User() {
                 <div className="pd-20 card-box ">
                   <div className="usertable">
                   <div
-                    style={{ float: "right", display: "flex", gap:"10px" }}
+                    style={{ float: "right", display: "flex", gap:"10px",width:"54%" }}
                     className="form-group filterInput"
                   >
                     <input
@@ -132,6 +132,7 @@ export default function User() {
                     <select
                       name="usersubscription"
                       className="form-control SelectBoxHeight"
+                      style={{width:"78%"}}
                       id="usersubscription"
                       value={filterSubscription}
                       onChange={(e) => setFilterSubscription(e.target.value)}
@@ -145,6 +146,7 @@ export default function User() {
                       name="subscriptionPlatform"
                       className="form-control SelectBoxHeight1"
                       id="subscriptionPlatform"
+                      style={{width:"84%"}}
                       value={filterPlatform}
                       onChange={(e) => setFilterPlatform(e.target.value)}
                     >

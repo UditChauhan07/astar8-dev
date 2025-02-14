@@ -3,13 +3,16 @@ import ChatItem from "./ChatItem";
 import Loader from "../Loader/Loader";
 
 const ChatList = ({ users, onSelectUser }) => {
-  console.log("userListdddddd",users)
+  console.log("userrer",users)
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true); // Add loading state
-  // console.log("asdasd", loading);
+  console.log("loading", loading);
   useEffect(() => {
     if (users) {
       setLoading(false);
+    }
+    else if (users === undefined){
+      setLoading(false)
     }
   }, [users]);
 

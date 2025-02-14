@@ -320,7 +320,7 @@ export default function Dashboard() {
                     <NavLink to="/dashboard" className="dropdown-toggle no-arrow">
                       <span>
                         {" "}
-                        <FontAwesomeIcon icon={faHouse} />
+                        <FontAwesomeIcon icon={faHouse} style={{height:"20px"}}/>
                       </span>
                       <span className="mtext">Home</span>
                     </NavLink>
@@ -331,7 +331,7 @@ export default function Dashboard() {
                         className="dropdown-toggle no-arrow"
                       >
                         <span className="sideBarIcon">
-                          <FontAwesomeIcon icon={faComment} />
+                          <FontAwesomeIcon icon={faComment} style={{height:"20px"}} />
                         </span>
                         <span className="mtext">User Messages</span>
                       </NavLink>
@@ -342,7 +342,7 @@ export default function Dashboard() {
                         className="dropdown-toggle no-arrow"
                       >
                         <span className="sideBarIcon">
-                          <FontAwesomeIcon icon={faBook} />
+                          <FontAwesomeIcon icon={faBook} style={{height:"20px"}} />
                         </span>
                         <span className="mtext">Daily Forecast</span>
                       </NavLink>
@@ -354,7 +354,7 @@ export default function Dashboard() {
                         className="dropdown-toggle no-arrow"
                       >
                         <span className="sideBarIcon">
-                          <FontAwesomeIcon icon={faCog} />
+                          <FontAwesomeIcon icon={faCog} style={{height:"20px"}} />
                         </span>
                         <span className="mtext">General Setting</span>
                       </NavLink>
@@ -363,7 +363,7 @@ export default function Dashboard() {
                     <li className="dropdown">
                       <NavLink to="/payment" className="dropdown-toggle no-arrow">
                         <span className="sideBarIcon">
-                          <FontAwesomeIcon icon={faDollarSign} />
+                          <FontAwesomeIcon icon={faDollarSign} style={{height:"22px",paddingLeft:"3px"}} />
                         </span>
                         <span className="mtext">Payment Setting</span>
                       </NavLink>
@@ -371,7 +371,7 @@ export default function Dashboard() {
                     <li className="dropdown">
                       <NavLink to="/users" className="dropdown-toggle no-arrow">
                         <span className="sideBarIcon">
-                          <FontAwesomeIcon icon={faUser} />
+                          <FontAwesomeIcon icon={faUser} style={{height:"20px",paddingLeft:"1px"}} />
                         </span>
                         <span className="mtext">Users</span>
                       </NavLink>
