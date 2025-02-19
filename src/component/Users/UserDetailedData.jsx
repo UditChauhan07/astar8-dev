@@ -111,6 +111,10 @@ export default function UserDetailedData() {
                               ? userDetails.userdetails.profile_pic
                               : "https://be.astar8.com/img/default-profile-img.png"
                           }
+                          onError={(e) => {
+                            e.target.onerror = null; 
+                            e.target.src = "https://be.astar8.com/img/default-profile-img.png"; 
+                          }}
                           height="100%"
                           width="100%"
                         />

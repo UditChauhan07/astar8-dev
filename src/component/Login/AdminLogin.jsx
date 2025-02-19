@@ -162,7 +162,7 @@ export default function AdminLogin() {
                       handleInputChange();
                     }}
                     required
-                    style={{ paddingRight: "35px" }} // Add space for the eye icon
+                    style={{ paddingRight: "35px" }} // Add space for the eye icond
                   />
                   {password && (
                     <span

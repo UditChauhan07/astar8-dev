@@ -4,6 +4,7 @@ import { IoIosEye } from "react-icons/io";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 import { getDestinyNumbers } from "../../lib/Store";
+import Loader from "../../component/Loader/Loader";
 
 const DestinyNumbers = () => {
   const [destinyNumber, showDestinyNumber] = useState([]);
@@ -36,21 +37,21 @@ const DestinyNumbers = () => {
     };
   }, []);
 
-    // Handle View Click
-    const handleViewClick = (item) => {
-      const newWindow = window.open("/destinyShow/view", "_blank");
-      localStorage.setItem("viewData", JSON.stringify(item));
-      newWindow.dataFromParent = item;
-      console.log("viewData", item);
-    };
-  
-    // Handle Edit Click
-    const handleEditClick = (item) => {
-      const newWindow = window.open("destinyEdit/edit", "_blank");
-      localStorage.setItem("editData", JSON.stringify(item));
-      newWindow.dataFromParent = item;
-      console.log("editData", item);
-    };
+  // Handle View Click
+  const handleViewClick = (item) => {
+    const newWindow = window.open("/destinyShow/view", "_blank");
+    localStorage.setItem("viewData", JSON.stringify(item));
+    newWindow.dataFromParent = item;
+    console.log("viewData", item);
+  };
+
+  // Handle Edit Click
+  const handleEditClick = (item) => {
+    const newWindow = window.open("destinyEdit/edit", "_blank");
+    localStorage.setItem("editData", JSON.stringify(item));
+    newWindow.dataFromParent = item;
+    console.log("editData", item);
+  };
 
   return (
     <>
@@ -65,48 +66,49 @@ const DestinyNumbers = () => {
             </div>
           </div>
         </div>
-        <div className="pd-20 card-box mb-30">
-          <div className="card-block table-border-style">
-            <table className="table table-striped">
-              <tbody>
-                <tr>
-                  <th>Number</th>
-                  <th>Description</th>
-                  <th width="280px">Action</th>
-                </tr>
-                {destinyNumber?.map((item) => (
+        {loading ? (
+          <Loader />
+        ) : (
+          <div className="pd-20 card-box mb-30">
+            <div className="card-block table-border-style">
+              <table className="table table-striped">
+                <tbody>
                   <tr>
-                    <td>{item.number}</td>
-                    <td>
-                     {item.description}
-                    </td>
-                    <td>
-                      <div style={{ display: "flex", gap: "10px" }}>
-                        <a
-                          className="btn btn-info"
-                          onClick={() => handleViewClick(item)}
-                          title="View"
-                          target="_blank"
-                        >
-                          <IoIosEye size={18} />
-                        </a>
-                        <a
-                          className="btn btn-primary"
-                      
-                          title="Edit"
-                          target="_blank"
-                          onClick={() => handleEditClick(item)}
-                        >
-                          <FontAwesomeIcon icon={faPencilAlt} />
-                        </a>
-                      </div>
-                    </td>
+                    <th>Number</th>
+                    <th>Description</th>
+                    <th width="280px">Action</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                  {destinyNumber?.map((item) => (
+                    <tr>
+                      <td>{item.number}</td>
+                      <td>{item.description}</td>
+                      <td>
+                        <div style={{ display: "flex", gap: "10px" }}>
+                          <a
+                            className="btn btn-info"
+                            onClick={() => handleViewClick(item)}
+                            title="View"
+                            target="_blank"
+                          >
+                            <IoIosEye size={18} />
+                          </a>
+                          <a
+                            className="btn btn-primary"
+                            title="Edit"
+                            target="_blank"
+                            onClick={() => handleEditClick(item)}
+                          >
+                            <FontAwesomeIcon icon={faPencilAlt} />
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </>
   );

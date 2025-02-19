@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Header from "../../../component/Dashboard/Header";
+import Header from "../../../component/Dashboard/Header"
 import Swal from "sweetalert2";
 import { editMasterNumber, editNameReading } from "../../../lib/Store";
 

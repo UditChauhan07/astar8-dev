@@ -20,10 +20,10 @@ export default function UserData({ user, currentPage, usersPerPage, loading }) {
     window.open(`/userDetailedData`, "_blank");
   };
 
-  const subscription1Month = async (id) => {
+  const subscriptionspecialMonth = async (id) => {
     Swal.fire({
       title: "Are you sure?",
-      text: "Do you want to activate a 1-month subscription!",
+      text: "Do you want to activate a subscription!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#0199FE",
@@ -48,7 +48,7 @@ export default function UserData({ user, currentPage, usersPerPage, loading }) {
           Swal.close();
           Swal.fire({
             title: "Activated!",
-            text: "1 Month Subscription has been activated successfully.",
+            text: "Subscription has been activated successfully.",
             icon: "success",
             timer: 2000,
             showConfirmButton: false,
@@ -112,10 +112,10 @@ export default function UserData({ user, currentPage, usersPerPage, loading }) {
     });
   };
 
-  const Cancelsubscription1Month = async (id) => {
+  const CancelsubscriptionspecialMonth = async (id) => {
     Swal.fire({
       title: "Are you sure?",
-      text: "Do you want to cancel the 1-month subscription?",
+      text: "Do you want to cancel the subscription?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#0199FE",
@@ -139,7 +139,7 @@ export default function UserData({ user, currentPage, usersPerPage, loading }) {
           Swal.close();
           Swal.fire({
             title: "Canceled!",
-            text: "1 Month Subscription has been canceled successfully.",
+            text: "Subscription has been canceled successfully.",
             icon: "success",
             timer: 2000,
             showConfirmButton: false,
@@ -214,7 +214,7 @@ export default function UserData({ user, currentPage, usersPerPage, loading }) {
             <th>Subscription Status</th>
             <th>Payment Platform</th>
             <th>Subscription Action</th>
-            <th>3 Month Subscription Action</th>
+            {/* <th>3 Month Subscription Action</th> */}
             <th>Action</th>
           </tr>
           {loading ? (
@@ -235,17 +235,17 @@ export default function UserData({ user, currentPage, usersPerPage, loading }) {
                   <td>{data.name}</td>
                   <td>{data.email || data.username}</td>
                   <td style={{ textAlign: "center" }}>
-                    {data.subscription_status === 4 ? "Free" : "Paid"}
+                    {data.subscription_status === 0 ? "Free" : "Paid"}
                   </td>
                   <td>{data.platform || "N/A"}</td>
                   <td style={{ textAlign: "center" }}>
-                    {data.subscription_status === 1 ? (
+                    {data.subscription_status === 9 ? (
                       <button
                         type="submit"
                         name="subscribe"
                         className="btn btn-danger alert-subscribe"
                         title="Click to Inactivate Subscription"
-                        onClick={() => Cancelsubscription1Month(data.id)}
+                        onClick={() => CancelsubscriptionspecialMonth(data.id)}
                       >
                         InActive
                       </button>
@@ -256,15 +256,15 @@ export default function UserData({ user, currentPage, usersPerPage, loading }) {
                         className="btn alert-subscribe"
                         style={{ backgroundColor: "#0199FE", color: "white" }}
                         title="Click to Activate Subscription"
-                        onClick={() => subscription1Month(data.id)}
-                        disabled={data.subscription_status === 2}
+                        onClick={() => subscriptionspecialMonth(data.id)}
+                        disabled={data.subscription_status === 0}
                       >
                         Active
                       </button>
                     )}
                   </td>
 
-                  <td style={{ textAlign: "center" }}>
+                  {/* <td style={{ textAlign: "center" }}>
                     {data.subscription_status === 2 ? (
                       <button
                         type="submit"
@@ -288,7 +288,7 @@ export default function UserData({ user, currentPage, usersPerPage, loading }) {
                         Active
                       </button>
                     )}
-                  </td>
+                  </td> */}
 
                   <td className="userTableTd">
                     <a

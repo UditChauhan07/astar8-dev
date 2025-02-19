@@ -1,35 +1,95 @@
 import React, { useEffect, useState } from "react";
 import "../../styles/Style.css";
 import Header from "../Dashboard/Header";
-import { getAllUsers } from "../../lib/Store";
+import { getAllUsers, filterUsers } from "../../lib/Store";
 import UserData from "./UserData";
 import { toast, Toaster } from "react-hot-toast";
 export default function User() {
   const [user, setUser] = useState([]);
-  console.log("userrrr111", user);
   const [currentPage, setCurrentPage] = useState(1);
   const [usersPerPage, setUsersPerPage] = useState(10);
   const [activeTab, setActiveTab] = useState("all");
   const [totalPages, setTotalPages] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [nextPageToken, setNextPageToken] = useState(null);
   const [filterName, setFilterName] = useState("");
   const [filterEmail, setFilterEmail] = useState("");
   const [filterSubscription, setFilterSubscription] = useState("");
-  console.log("filterr", filterSubscription);
   const [filterPlatform, setFilterPlatform] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [filterloading,setfilterloading]=useState(false)
 
-  const fetchUsers = async (status = null) => {
+  // 🔹 Handle Search Button Click
+  const handleSearch = async () => {
+    try {
+      setfilterloading(true);
+      const isFilterEmpty =
+        !filterName && !filterEmail && !filterSubscription && !filterPlatform;
+      if (isFilterEmpty) {
+        fetchUsers();
+      } else {
+        const data = await filterUsers(
+          filterName,
+          filterEmail,
+          filterSubscription,
+          filterPlatform
+        );
+        setUser(data);
+      }
+
+      setCurrentPage(1);
+      setfilterloading(false);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      setfilterloading(false);
+    }
+  };
+  const handleClear = () => {
+    setFilterName("");
+    setFilterEmail("");
+    setFilterSubscription("");
+    setFilterPlatform("");
+    fetchUsers();
+  };
+
+  const fetchUsers = async (
+    status = null,
+    pageNumber = 1,
+    pageToken = null
+  ) => {
     try {
       setLoading(true);
       const token = localStorage.getItem("UserToken");
       if (!token) {
         throw new Error("User token not found");
       }
-      const response = await getAllUsers(token, status);
-      // console.log("resss.........", response);
+
+      // Determine `is_active` based on `activeTab`
+      let isActiveValue = null;
+      if (activeTab === "active") isActiveValue = 1;
+      else if (activeTab === "inactive") isActiveValue = 0;
+
+      // Construct API URL
+      let url = `/usr123erd6?page=${pageNumber}`;
+      if (isActiveValue !== null) url += `&is_active=${isActiveValue}`;
+      if (pageToken) url += `&pageToken=${pageToken}`;
+
+      console.log("Fetching users with:", {
+        pageNumber,
+        pageToken,
+        isActiveValue,
+      });
+
+      const response = await getAllUsers(token, url);
+
       if (response && response.Users) {
-        setUser(response.Users);
-        setTotalPages(Math.ceil(response.Users.length / usersPerPage));
+        setUser((prevUsers) =>
+          pageNumber === 1 ? response.Users : [...prevUsers, ...response.Users]
+        );
+
+        // ✅ Only update `nextPageToken` if a new one is available
+        setNextPageToken(response.nextPageToken || null);
+
+        setCurrentPage(pageNumber);
       } else {
         throw new Error("Failed to fetch users or no users found.");
       }
@@ -39,23 +99,24 @@ export default function User() {
       setLoading(false);
     }
   };
+  const paginate = (pageNumber) => {
+    let tokenToSend = pageNumber === 1 ? null : nextPageToken;
 
-  const filteredUsers = user.filter(
-    (u) =>
-      u.name &&
-      u.name.toLowerCase().includes(filterName.toLowerCase()) &&
-      ((u.email && u.email.toLowerCase().includes(filterEmail.toLowerCase())) ||
-        (u.username &&
-          u.username.toLowerCase().includes(filterEmail.toLowerCase()))) &&
-      (filterSubscription === "" ||
-        u.subscription_status == filterSubscription ||
-        (u.subscription_status === 4 && filterSubscription == 0)) && // Handle null == 0 case
-      (filterPlatform === "" ||
-        (u.platform &&
-          u.platform.toLowerCase().includes(filterPlatform.toLowerCase())))
-  );
+    console.log(
+      `Paginating to page: ${pageNumber}, Sending token:`,
+      tokenToSend
+    );
+
+    fetchUsers(
+      activeTab === "all" ? null : activeTab === "active" ? 1 : 0,
+      pageNumber,
+      tokenToSend
+    );
+  };
 
   useEffect(() => {
+    setUser([]);
+    setNextPageToken(null);
     if (activeTab === "all") {
       fetchUsers();
     } else if (activeTab === "active") {
@@ -68,14 +129,11 @@ export default function User() {
 
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+  const currentUsers = user.slice(indexOfFirstUser, indexOfLastUser);
 
   useEffect(() => {
-    setTotalPages(Math.ceil(filteredUsers.length / usersPerPage));
-  }, [filteredUsers, usersPerPage]);
-
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+    setTotalPages(Math.ceil(user.length / usersPerPage));
+  }, [user, usersPerPage]);
   return (
     <>
       <Header />
@@ -99,423 +157,301 @@ export default function User() {
               </div>
             </div>
 
-          
-
             <div className="row clearfix">
               <div className="col-lg-12 col-md-12 col-sm-12 mb-30 ">
                 <div className="pd-20 card-box ">
                   <div className="usertable">
-                  <div
-                    style={{ float: "right", display: "flex", gap:"10px",width:"54%" }}
-                    className="form-group filterInput"
-                  >
-                    <input
-                      type="text"
-                      className="form-control"
-                      style={{ width: 140 }}
-                      name="username"
-                      id="username"
-                      placeholder="Enter Name"
-                      value={filterName}
-                      onChange={(e) => setFilterName(e.target.value)}
-                    />
-                    <input
-                      type="text"
-                      className="form-control"
-                      style={{ width: 140 }}
-                      name="useremail"
-                      id="useremail"
-                      placeholder="Enter Email"
-                      value={filterEmail}
-                      onChange={(e) => setFilterEmail(e.target.value)}
-                    />
-                    <select
-                      name="usersubscription"
-                      className="form-control SelectBoxHeight"
-                      style={{width:"78%"}}
-                      id="usersubscription"
-                      value={filterSubscription}
-                      onChange={(e) => setFilterSubscription(e.target.value)}
+                    <div
+                      style={{
+                        float: "right",
+                        display: "flex",
+                        gap: "10px",
+                        width: "65%",
+                      }}
+                      className="form-group filterInput"
                     >
-                      <option value="">Subscription</option>
-                      <option value={0}>Free</option>
-                      <option value={1}>Paid</option>
-                      <option value={9}>Special offer</option>
-                    </select>
-                    <select
-                      name="subscriptionPlatform"
-                      className="form-control SelectBoxHeight1"
-                      id="subscriptionPlatform"
-                      style={{width:"84%"}}
-                      value={filterPlatform}
-                      onChange={(e) => setFilterPlatform(e.target.value)}
-                    >
-                      <option value="">Select Platform</option>
-                      <option value="iOS">iOS</option>
-                      <option value="Android">Android</option>
-                    </select>
-                  </div>
-                  <div className="tab">
-                    <ul className="nav nav-tabs" role="tablist">
-                      <li className="nav-item">
-                        <a
-                          className={`nav-link text-blue ${
+                      <input
+                        type="text"
+                        className="form-control"
+                        style={{ width: 140 }}
+                        name="username"
+                        id="username"
+                        placeholder="Enter Name"
+                        value={filterName}
+                        onChange={(e) => setFilterName(e.target.value)}
+                      />
+                      <input
+                        type="text"
+                        className="form-control"
+                        style={{ width: 140 }}
+                        name="useremail"
+                        id="useremail"
+                        placeholder="Enter Email"
+                        value={filterEmail}
+                        onChange={(e) => setFilterEmail(e.target.value)}
+                      />
+                      <select
+                        name="usersubscription"
+                        className="form-control SelectBoxHeight"
+                        style={{ width: "78%" }}
+                        id="usersubscription"
+                        value={filterSubscription}
+                        onChange={(e) => setFilterSubscription(e.target.value)}
+                      >
+                        <option value="">Subscription</option>
+                        <option value={0}>Free</option>
+                        <option value={1}>Paid</option>
+                        <option value={9}>Special offer</option>
+                      </select>
+                      <select
+                        name="subscriptionPlatform"
+                        className="form-control SelectBoxHeight1"
+                        id="subscriptionPlatform"
+                        style={{ width: "84%" }}
+                        value={filterPlatform}
+                        onChange={(e) => setFilterPlatform(e.target.value)}
+                      >
+                        <option value="">Select Platform</option>
+                        <option value="iOS">iOS</option>
+                        <option value="Android">Android</option>
+                      </select>
+                      {/* 🔹 Search Button */}
+                      <button
+                        className="btn btn-primary"
+                        style={{ height: "40px" }}
+                        onClick={handleSearch}
+                      >
+                        {filterloading ? "Searching..." : "Search"}
+                      </button>
+                      <button
+                        className="btn btn-danger"
+                        style={{ height: "40px", marginLeft: "5px" }}
+                        onClick={handleClear}
+                      >
+                        Reset
+                      </button>
+                    </div>
+
+                    <div className="tab">
+                      <ul className="nav nav-tabs" role="tablist">
+                        <li className="nav-item">
+                          <a
+                            className={`nav-link text-blue ${
+                              activeTab === "all" ? "active" : ""
+                            }`}
+                            onClick={() => setActiveTab("all")}
+                          >
+                            All
+                          </a>
+                        </li>
+                        <li className="nav-item">
+                          <a
+                            className={`nav-link text-blue ${
+                              activeTab === "active" ? "active" : ""
+                            }`}
+                            onClick={() => setActiveTab("active")}
+                          >
+                            Active
+                          </a>
+                        </li>
+                        <li className="nav-item">
+                          <a
+                            className={`nav-link text-blue ${
+                              activeTab === "inactive" ? "active" : ""
+                            }`}
+                            onClick={() => setActiveTab("inactive")}
+                          >
+                            Inactive
+                          </a>
+                        </li>
+                      </ul>
+
+                      <div className="tab-content">
+                        {/* All Users */}
+                        <div
+                          className={`tab-pane fade show ${
                             activeTab === "all" ? "active" : ""
                           }`}
-                          onClick={() => setActiveTab("all")}
+                          id="all"
+                          role="tabpanel"
                         >
-                          All
-                        </a>
-                      </li>
-                      <li className="nav-item">
-                        <a
-                          className={`nav-link text-blue ${
-                            activeTab === "active" ? "active" : ""
+                          <div className="card-block table-border-style alluserlist">
+                            <UserData
+                              user={currentUsers}
+                              currentPage={currentPage}
+                              usersPerPage={usersPerPage}
+                              loading={loading}
+                            />
+                          </div>
+                          <div className="custom-pagination">
+                            <nav>
+                              <ul className="pagination">
+                                {/* Previous Button */}
+                                <li
+                                  className={`page-item ${
+                                    currentPage === 1 ? "disabled" : ""
+                                  }`}
+                                >
+                                  <span
+                                    className="page-link"
+                                    onClick={() =>
+                                      currentPage > 1 &&
+                                      paginate(currentPage - 1)
+                                    }
+                                  >
+                                    ‹
+                                  </span>
+                                </li>
+
+                                {/* Current Page Number */}
+                                <li className="page-item active">
+                                  <span className="page-link">
+                                    {currentPage}
+                                  </span>
+                                </li>
+
+                                {/* Next Button */}
+                                <li
+                                  className={`page-item ${
+                                    !nextPageToken ? "disabled" : ""
+                                  }`}
+                                >
+                                  <span
+                                    className="page-link"
+                                    onClick={() =>
+                                      nextPageToken && paginate(currentPage + 1)
+                                    }
+                                  >
+                                    ›
+                                  </span>
+                                </li>
+                              </ul>
+                            </nav>
+                          </div>
+                        </div>
+                        <div
+                          className={`tab-pane fade ${
+                            activeTab === "active" ? "show active" : ""
                           }`}
-                          onClick={() => setActiveTab("active")}
+                          id="activeUser"
+                          role="tabpanel"
                         >
-                          Active
-                        </a>
-                      </li>
-                      <li className="nav-item">
-                        <a
-                          className={`nav-link text-blue ${
-                            activeTab === "inactive" ? "active" : ""
+                          <div className="card-block table-border-style">
+                            <UserData
+                              user={currentUsers}
+                              currentPage={currentPage}
+                              usersPerPage={usersPerPage}
+                            />
+                          </div>
+                          <div className="custom-pagination">
+                            <nav>
+                              <ul className="pagination">
+                                {/* Previous Button */}
+                                <li
+                                  className={`page-item ${
+                                    currentPage === 1 ? "disabled" : ""
+                                  }`}
+                                >
+                                  <span
+                                    className="page-link"
+                                    onClick={() =>
+                                      currentPage > 1 &&
+                                      paginate(currentPage - 1)
+                                    }
+                                  >
+                                    ‹
+                                  </span>
+                                </li>
+
+                                {/* Current Page Number */}
+                                <li className="page-item active">
+                                  <span className="page-link">
+                                    {currentPage}
+                                  </span>
+                                </li>
+
+                                {/* Next Button */}
+                                <li
+                                  className={`page-item ${
+                                    !nextPageToken ? "disabled" : ""
+                                  }`}
+                                >
+                                  <span
+                                    className="page-link"
+                                    onClick={() =>
+                                      nextPageToken && paginate(currentPage + 1)
+                                    }
+                                  >
+                                    ›
+                                  </span>
+                                </li>
+                              </ul>
+                            </nav>
+                          </div>
+                        </div>
+                        <div
+                          className={`tab-pane fade ${
+                            activeTab === "inactive" ? "show active" : ""
                           }`}
-                          onClick={() => setActiveTab("inactive")}
+                          id="inactiveUser"
+                          role="tabpanel"
                         >
-                          Inactive
-                        </a>
-                      </li>
-                    </ul>
-
-                    <div className="tab-content">
-                      {/* All Users */}
-                      <div
-                        className={`tab-pane fade show ${
-                          activeTab === "all" ? "active" : ""
-                        }`}
-                        id="all"
-                        role="tabpanel"
-                      >
-                        <div className="card-block table-border-style alluserlist">
-                          <UserData
-                            user={currentUsers}
-                            currentPage={currentPage}
-                            usersPerPage={usersPerPage}
-                            loading={loading}
-                          />
-                        </div>
-                        <div className="custom-pagination">
-                          <nav>
-                            <ul className="pagination">
-                              {/* Previous Button */}
-                              <li
-                                className={`page-item ${
-                                  currentPage === 1 ? "disabled" : ""
-                                }`}
-                              >
-                                <span
-                                  className="page-link"
-                                  aria-hidden="true"
-                                  onClick={() =>
-                                    currentPage > 1 && paginate(currentPage - 1)
-                                  }
+                          <div className="card-block table-border-style">
+                            <UserData
+                              user={currentUsers}
+                              currentPage={currentPage}
+                              usersPerPage={usersPerPage}
+                            />
+                          </div>
+                          <div className="custom-pagination">
+                            <nav>
+                              <ul className="pagination">
+                                {/* Previous Button */}
+                                <li
+                                  className={`page-item ${
+                                    currentPage === 1 ? "disabled" : ""
+                                  }`}
                                 >
-                                  ‹
-                                </span>
-                              </li>
+                                  <span
+                                    className="page-link"
+                                    onClick={() =>
+                                      currentPage > 1 &&
+                                      paginate(currentPage - 1)
+                                    }
+                                  >
+                                    ‹
+                                  </span>
+                                </li>
 
-                              {/* Pagination Numbers */}
-                              {[...Array(totalPages).keys()]
-                                .map((number) => number + 1)
-                                .filter((pageNumber) => {
-                                  // Display the first 10 pages
-                                  if (pageNumber <= 10) return true;
-                                  // Display the last 2 pages
-                                  if (pageNumber > totalPages - 2) return true;
-                                  // Display the current page and its neighbors
-                                  if (
-                                    pageNumber >= currentPage - 1 &&
-                                    pageNumber <= currentPage + 1
-                                  )
-                                    return true;
-                                  return false;
-                                })
-                                .map((pageNumber, index, filteredPages) => {
-                                  // Add ellipsis logic
-                                  const previousPage = filteredPages[index - 1];
-                                  if (
-                                    previousPage &&
-                                    pageNumber > previousPage + 1
-                                  ) {
-                                    return (
-                                      <li
-                                        className="page-item disabled"
-                                        key={`ellipsis-${index}`}
-                                      >
-                                        <span className="page-link">...</span>
-                                      </li>
-                                    );
-                                  }
+                                {/* Current Page Number */}
+                                <li className="page-item active">
+                                  <span className="page-link">
+                                    {currentPage}
+                                  </span>
+                                </li>
 
-                                  // Render page number
-                                  return (
-                                    <li
-                                      className={`page-item ${
-                                        currentPage === pageNumber
-                                          ? "active"
-                                          : ""
-                                      }`}
-                                      key={pageNumber}
-                                    >
-                                      <span
-                                        className="page-link"
-                                        onClick={() => paginate(pageNumber)}
-                                      >
-                                        {pageNumber}
-                                      </span>
-                                    </li>
-                                  );
-                                })}
-
-                              {/* Next Button */}
-                              <li
-                                className={`page-item ${
-                                  currentPage === totalPages ? "disabled" : ""
-                                }`}
-                              >
-                                <span
-                                  className="page-link"
-                                  onClick={() =>
-                                    currentPage < totalPages &&
-                                    paginate(currentPage + 1)
-                                  }
+                                {/* Next Button */}
+                                <li
+                                  className={`page-item ${
+                                    !nextPageToken ? "disabled" : ""
+                                  }`}
                                 >
-                                  ›
-                                </span>
-                              </li>
-                            </ul>
-                          </nav>
-                        </div>
-                      </div>
-                      <div
-                        className={`tab-pane fade ${
-                          activeTab === "active" ? "show active" : ""
-                        }`}
-                        id="activeUser"
-                        role="tabpanel"
-                      >
-                        <div className="card-block table-border-style">
-                          <UserData
-                            user={currentUsers}
-                            currentPage={currentPage}
-                            usersPerPage={usersPerPage}
-                          />
-                        </div>
-                        <div className="custom-pagination">
-                          <nav>
-                            <ul className="pagination">
-                              {/* Previous Button */}
-                              <li
-                                className={`page-item ${
-                                  currentPage === 1 ? "disabled" : ""
-                                }`}
-                              >
-                                <span
-                                  className="page-link"
-                                  aria-hidden="true"
-                                  onClick={() =>
-                                    currentPage > 1 && paginate(currentPage - 1)
-                                  }
-                                >
-                                  ‹
-                                </span>
-                              </li>
-
-                              {/* Pagination Numbers */}
-                              {[...Array(totalPages).keys()]
-                                .map((number) => number + 1)
-                                .filter((pageNumber) => {
-                                  // Display the first 10 pages
-                                  if (pageNumber <= 10) return true;
-                                  // Display the last 2 pages
-                                  if (pageNumber > totalPages - 2) return true;
-                                  // Display the current page and its neighbors
-                                  if (
-                                    pageNumber >= currentPage - 1 &&
-                                    pageNumber <= currentPage + 1
-                                  )
-                                    return true;
-                                  return false;
-                                })
-                                .map((pageNumber, index, filteredPages) => {
-                                  // Add ellipsis logic
-                                  const previousPage = filteredPages[index - 1];
-                                  if (
-                                    previousPage &&
-                                    pageNumber > previousPage + 1
-                                  ) {
-                                    return (
-                                      <li
-                                        className="page-item disabled"
-                                        key={`ellipsis-${index}`}
-                                      >
-                                        <span className="page-link">...</span>
-                                      </li>
-                                    );
-                                  }
-
-                                  // Render page number
-                                  return (
-                                    <li
-                                      className={`page-item ${
-                                        currentPage === pageNumber
-                                          ? "active"
-                                          : ""
-                                      }`}
-                                      key={pageNumber}
-                                    >
-                                      <span
-                                        className="page-link"
-                                        onClick={() => paginate(pageNumber)}
-                                      >
-                                        {pageNumber}
-                                      </span>
-                                    </li>
-                                  );
-                                })}
-
-                              {/* Next Button */}
-                              <li
-                                className={`page-item ${
-                                  currentPage === totalPages ? "disabled" : ""
-                                }`}
-                              >
-                                <span
-                                  className="page-link"
-                                  onClick={() =>
-                                    currentPage < totalPages &&
-                                    paginate(currentPage + 1)
-                                  }
-                                >
-                                  ›
-                                </span>
-                              </li>
-                            </ul>
-                          </nav>
-                        </div>
-                      </div>
-                      <div
-                        className={`tab-pane fade ${
-                          activeTab === "inactive" ? "show active" : ""
-                        }`}
-                        id="inactiveUser"
-                        role="tabpanel"
-                      >
-                        <div className="card-block table-border-style">
-                          <UserData
-                            user={currentUsers}
-                            currentPage={currentPage}
-                            usersPerPage={usersPerPage}
-                          />
-                        </div>
-                        <div className="custom-pagination">
-                          <nav>
-                            <ul className="pagination">
-                              {/* Previous Button */}
-                              <li
-                                className={`page-item ${
-                                  currentPage === 1 ? "disabled" : ""
-                                }`}
-                              >
-                                <span
-                                  className="page-link"
-                                  aria-hidden="true"
-                                  onClick={() =>
-                                    currentPage > 1 && paginate(currentPage - 1)
-                                  }
-                                >
-                                  ‹
-                                </span>
-                              </li>
-
-                              {/* Pagination Numbers */}
-                              {[...Array(totalPages).keys()]
-                                .map((number) => number + 1)
-                                .filter((pageNumber) => {
-                                  // Display the first 10 pages
-                                  if (pageNumber <= 10) return true;
-                                  // Display the last 2 pages
-                                  if (pageNumber > totalPages - 2) return true;
-                                  // Display the current page and its neighbors
-                                  if (
-                                    pageNumber >= currentPage - 1 &&
-                                    pageNumber <= currentPage + 1
-                                  )
-                                    return true;
-                                  return false;
-                                })
-                                .map((pageNumber, index, filteredPages) => {
-                                  // Add ellipsis logic
-                                  const previousPage = filteredPages[index - 1];
-                                  if (
-                                    previousPage &&
-                                    pageNumber > previousPage + 1
-                                  ) {
-                                    return (
-                                      <li
-                                        className="page-item disabled"
-                                        key={`ellipsis-${index}`}
-                                      >
-                                        <span className="page-link">...</span>
-                                      </li>
-                                    );
-                                  }
-
-                                  // Render page number
-                                  return (
-                                    <li
-                                      className={`page-item ${
-                                        currentPage === pageNumber
-                                          ? "active"
-                                          : ""
-                                      }`}
-                                      key={pageNumber}
-                                    >
-                                      <span
-                                        className="page-link"
-                                        onClick={() => paginate(pageNumber)}
-                                      >
-                                        {pageNumber}
-                                      </span>
-                                    </li>
-                                  );
-                                })}
-
-                              {/* Next Button */}
-                              <li
-                                className={`page-item ${
-                                  currentPage === totalPages ? "disabled" : ""
-                                }`}
-                              >
-                                <span
-                                  className="page-link"
-                                  onClick={() =>
-                                    currentPage < totalPages &&
-                                    paginate(currentPage + 1)
-                                  }
-                                >
-                                  ›
-                                </span>
-                              </li>
-                            </ul>
-                          </nav>
+                                  <span
+                                    className="page-link"
+                                    onClick={() =>
+                                      nextPageToken && paginate(currentPage + 1)
+                                    }
+                                  >
+                                    ›
+                                  </span>
+                                </li>
+                              </ul>
+                            </nav>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
                 </div>
               </div>
             </div>

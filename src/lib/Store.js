@@ -1,6 +1,6 @@
 import axios from "axios";
-// export const Url = "http://localhost:5234";
-export const Url = "https://dev.astar8.com"
+export const Url = "http://localhost:5234";
+// export const Url = "https://dev.astar8.com"
 
 //admin login api
 export const LoginApi = async (email, password) => {
@@ -643,7 +643,7 @@ export const getDestinyNumbers = async () => {
   }
 };
 // edit destiny number
-export const editDestinyNumber=async(finalData)=>{
+export const editDestinyNumber = async (finalData) => {
   try {
     const response = await axios.put(`${Url}/ele1a2mbfg/d1qmki7gr4`, finalData);
     const data = await response.data;
@@ -652,4 +652,90 @@ export const editDestinyNumber=async(finalData)=>{
     console.log(err, "error");
     return err;
   }
-}
+};
+
+// Add new video
+export const addVideo = async (formData) => {
+  try {
+    const response = await axios.post(
+      `${Url}/v1qaz2wsx3e/c23emki8zl`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response.data;
+  } catch (err) {
+    console.error("Error in addVideo:", err);
+    throw err;
+  }
+};
+//  get videos list api
+export const Videos = async () => {
+  try {
+    const response = await axios.get(`${Url}/v1qaz2wsx3e/v123wazxsd`);
+    const data = await response.data;
+    return data;
+  } catch (error) {
+    return error;
+  }
+};
+
+// edit video list
+export const editVideoList = async (finalData) => {
+  try {
+    const response = await axios.put(
+      `${Url}/v1qaz2wsx3e/v543d6mk78`,
+      finalData
+    );
+    const data = await response.data;
+    return data;
+  } catch (err) {
+    console.log(err, "error");
+    return err;
+  }
+};
+// get lifecoach description
+export const getLifeCoachdescription = async () => {
+  try {
+    const response = await axios.get(`${Url}/llwe32mjki/l1q2wazxvb`);
+    const data = await response.data;
+    return data;
+  } catch (error) {
+    return error;
+  }
+};
+// edit lifecoach description
+export const editLifeCoackDEscription = async (finalData) => {
+  try {
+    const response = await axios.put(`${Url}/llwe32mjki/eldk367890`, {
+      finalData,
+    });
+    const data = await response.data;
+    return data;
+  } catch (err) {
+    console.log(err, "error");
+    return err;
+  }
+};
+
+// filter user tables
+export const filterUsers = async (name, email, subscription, platform) => {
+  try {
+    let url = `${Url}/u1r5a03ki8/ufrm8u4j8i?`;
+
+    const params = new URLSearchParams();
+    if (name) params.append("name", name);
+    if (email) params.append("email", email);
+    if (subscription) params.append("subscription", subscription);
+    if (platform) params.append("platform", platform);
+
+    const response = await axios.get(url + params.toString());
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    return error;
+  }
+};

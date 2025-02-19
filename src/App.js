@@ -71,6 +71,11 @@ import ElementalShow from "./Pages/ElementalNumber/ElementalShow";
 import ElementalEdit from './Pages/ElementalNumber/ElementalEdit';
 import DestinyShow from "./Pages/DestinyNumbers/DestinyShow";
 import DestinyEdit from "./Pages/DestinyNumbers/DestinyEdit";
+import VideoShow from "./Pages/VideosPage/VideoShow";
+import VideoEdit from "./Pages/VideosPage/VideoEdit";
+import AddVideo from "./Pages/VideosPage/AddVideo";
+import LifeCoachDescriptionShow from "./Pages/LifeCoachDesc/LifeCoachDescriptionShow"
+import LifeCoachDescriptionEdit from './Pages/LifeCoachDesc/LifeCoachDescriptionEdit';
 function App() {
   return (
     <AppProvider>
@@ -119,7 +124,14 @@ function App() {
         <Route path="/destinyEdit/edit" element={<PrivateRoute element={DestinyEdit} />} />
 
         <Route path="/videos" element={<PrivateRoute element={VideosPage} />} />
+        <Route path="/Add_video" element={<PrivateRoute element={AddVideo} />} />
+        <Route path="/video_page/show" element={<PrivateRoute element={VideoShow} />} />
+        <Route path="/video_page/edit" element={<PrivateRoute element={VideoEdit} />} />
+
         <Route path="/lifecoach_descriptions" element={<PrivateRoute element={LifeCoachDesc} />} />
+        <Route path="/lifecoach_descriptions/show" element={<PrivateRoute element={LifeCoachDescriptionShow} />} />
+        <Route path="/lifecoach_descriptions/edit" element={<PrivateRoute element={LifeCoachDescriptionEdit} />} />
+
         <Route path="/subscription_price" element={<PrivateRoute element={SubscriptionPirce} />} />
         <Route path="/healthreading" element={<PrivateRoute element={HealthReading} />} />
         <Route path="/healthprecaution" element={<PrivateRoute element={HealthPrecaution} />} />
