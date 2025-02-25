@@ -19,7 +19,7 @@ const GeneralSettings = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent default form submission behavior
+    e.preventDefault();
   
     // Validation for the form
     if (!formData.number_of_user || isNaN(formData.number_of_user)) {
@@ -35,9 +35,9 @@ const GeneralSettings = () => {
     Swal.fire({
       title: "Processing...",
       text: "Please wait while we update the subscription.",
-      allowOutsideClick: false, // Prevent user from closing the alert
+      allowOutsideClick: false,
       didOpen: () => {
-        Swal.showLoading(); // Show the loading spinner
+        Swal.showLoading(); 
       },
     });
   
@@ -50,7 +50,6 @@ const GeneralSettings = () => {
     try {
       // Simulate or execute the API call
       const response = await subscriptionsUpdateUser(finalData);
-  
       // Handle success
       if (response.status === "success") {
         Swal.fire({
@@ -60,7 +59,7 @@ const GeneralSettings = () => {
         }).then(() => {
           setFormData((prevData) => ({
             ...prevData,
-            number_of_user: null, // Reset form field
+            number_of_user: null,
           }));
         });
       } else {

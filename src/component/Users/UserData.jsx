@@ -14,7 +14,6 @@ import {
 import { toast, Toaster } from "react-hot-toast";
 
 export default function UserData({ user, currentPage, usersPerPage, loading }) {
-  // console.log("UserList---",user)
   const onHandleNextPage = (id) => {
     localStorage.setItem("user_Detailed_id", id);
     window.open(`/userDetailedData`, "_blank");
@@ -214,7 +213,7 @@ export default function UserData({ user, currentPage, usersPerPage, loading }) {
             <th>Subscription Status</th>
             <th>Payment Platform</th>
             <th>Subscription Action</th>
-            {/* <th>3 Month Subscription Action</th> */}
+            <th>3 Month Subscription Action</th>
             <th>Action</th>
           </tr>
           {loading ? (
@@ -238,14 +237,17 @@ export default function UserData({ user, currentPage, usersPerPage, loading }) {
                     {data.subscription_status === 0 ? "Free" : "Paid"}
                   </td>
                   <td>{data.platform || "N/A"}</td>
-                  <td style={{ textAlign: "center" }}>
-                    {data.subscription_status === 9 ? (
+
+                  {/* 1- month subscription button */}
+                  {/* <td style={{ textAlign: "center" }}>
+                    {data.subscription_status === 9 || data.total_days <= 31 ? (
                       <button
                         type="submit"
                         name="subscribe"
                         className="btn btn-danger alert-subscribe"
                         title="Click to Inactivate Subscription"
                         onClick={() => CancelsubscriptionspecialMonth(data.id)}
+                        disabled={data.total_days > 0 && data.total_days >= 31} 
                       >
                         InActive
                       </button>
@@ -262,10 +264,11 @@ export default function UserData({ user, currentPage, usersPerPage, loading }) {
                         Active
                       </button>
                     )}
-                  </td>
+                  </td> */}
 
+                  {/* 3-month subscription button */}
                   {/* <td style={{ textAlign: "center" }}>
-                    {data.subscription_status === 2 ? (
+                    {data.subscription_status === 9 || data.total_days > 31 ? (
                       <button
                         type="submit"
                         name="subscribe"
@@ -283,12 +286,66 @@ export default function UserData({ user, currentPage, usersPerPage, loading }) {
                         style={{ backgroundColor: "#0199FE", color: "white" }}
                         title="Click to Activate Subscription"
                         onClick={() => subscription3Month(data.id)}
-                        disabled={data.subscription_status === 1}
+                        disabled={data.subscription_status === 0}
                       >
                         Active
                       </button>
                     )}
                   </td> */}
+
+                  {/* 1-Month Subscription Button */}
+                  <td style={{ textAlign: "center" }}>
+                    {data.total_days > 0 && data.total_days <= 31 ? (
+                      <button
+                        type="submit"
+                        name="subscribe"
+                        className="btn btn-danger alert-subscribe"
+                        title="Click to Inactivate Subscription"
+                        onClick={() => CancelsubscriptionspecialMonth(data.id)}
+                      >
+                        InActive
+                      </button>
+                    ) : (
+                      <button
+                        type="submit"
+                        name="subscribe"
+                        className="btn alert-subscribe"
+                        style={{ backgroundColor: "#0199FE", color: "white" }}
+                        title="Click to Activate Subscription"
+                        onClick={() => subscriptionspecialMonth(data.id)}
+                        disabled={data.total_days > 31} // 👈 3-month user ke liye disabled
+                      >
+                        Active
+                      </button>
+                    )}
+                  </td>
+
+                  {/* 3-Month Subscription Button */}
+                  <td style={{ textAlign: "center" }}>
+                    {data.total_days > 31 ? (
+                      <button
+                        type="submit"
+                        name="subscribe"
+                        className="btn btn-danger alert-subscribe"
+                        title="Click to Inactivate Subscription"
+                        onClick={() => cancel3Actions(data.id)}
+                      >
+                        InActive
+                      </button>
+                    ) : (
+                      <button
+                        type="submit"
+                        name="subscribe"
+                        className="btn alert-subscribe"
+                        style={{ backgroundColor: "#0199FE", color: "white" }}
+                        title="Click to Activate Subscription"
+                        onClick={() => subscription3Month(data.id)}
+                        disabled={data.total_days > 0 && data.total_days <= 31} // 👈 1-month user ke liye disabled
+                      >
+                        Active
+                      </button>
+                    )}
+                  </td>
 
                   <td className="userTableTd">
                     <a

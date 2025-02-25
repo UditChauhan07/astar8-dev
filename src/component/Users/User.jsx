@@ -16,7 +16,7 @@ export default function User() {
   const [filterEmail, setFilterEmail] = useState("");
   const [filterSubscription, setFilterSubscription] = useState("");
   const [filterPlatform, setFilterPlatform] = useState("");
-  const [filterloading,setfilterloading]=useState(false)
+  const [filterloading, setfilterloading] = useState(false);
 
   // 🔹 Handle Search Button Click
   const handleSearch = async () => {
@@ -55,6 +55,7 @@ export default function User() {
     status = null,
     pageNumber = 1,
     pageToken = null
+    
   ) => {
     try {
       setLoading(true);
@@ -112,6 +113,11 @@ export default function User() {
       pageNumber,
       tokenToSend
     );
+
+    window.scrollTo({
+      top: 300,
+      behavior: "smooth",
+    });
   };
 
   useEffect(() => {
@@ -129,7 +135,7 @@ export default function User() {
 
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const currentUsers = user.slice(indexOfFirstUser, indexOfLastUser);
+  const currentUsers = user?.slice(indexOfFirstUser, indexOfLastUser);
 
   useEffect(() => {
     setTotalPages(Math.ceil(user.length / usersPerPage));
